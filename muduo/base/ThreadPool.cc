@@ -112,13 +112,13 @@ void ThreadPool::run(Task&& task)
 
 ThreadPool::Task ThreadPool::take()
 {
+  Task task; //narrow critical region
   MutexLockGuard lock(mutex_);
   // always use a while-loop, due to spurious wakeup
   while (queue_.empty() && running_)
   {
     notEmpty_.wait();
   }
-  Task task;
   if (!queue_.empty())
   {
     task = queue_.front();
